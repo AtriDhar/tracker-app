@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight, Lock } from 'lucide-react';
 import ExerciseCard from '../components/ExerciseCard';
 import VideoModal from '../components/VideoModal';
 import WorkoutTimer from '../components/WorkoutTimer';
 import { workoutData } from '../data/workoutData';
+import { useAuth } from '../components/AuthContainer';
+import { supabase } from '../lib/supabase';
 
 export default function Tracker({ unit }) {
   const { dayId } = useParams();
+  const { user, isPro } = useAuth();
   const navigate = useNavigate();
   const currentDay = parseInt(dayId, 10);
   
@@ -25,20 +28,45 @@ export default function Tracker({ unit }) {
       return;
     }
 
-    try {
-      const memory = JSON.parse(localStorage.getItem('workout_memory') || '{}');
-      setDayMemory(memory[currentDay] || {});
-    } catch (e) {
-      console.error(e);
-    }
-  }, [currentDay, dayData, navigate]);
+    const loadLocal = () => {
+      try {
+        const memory = JSON.parse(localStorage.getItem('workout_memory') || '{}');
+        setDayMemory(memory[currentDay] || {});
+      } catch (e) {
+        console.error(e);
+      }
+    };
 
-  const saveMemory = (newMemory) => {
+    if (user) {
+      // Sync from cloud
+      supabase.from('workout_sync')
+        .select('memory_data')
+        .eq('user_id', user.id)
+        .eq('day_id', currentDay)
+        .single()
+        .then(({ data, error }) => {
+          if (!error && data) setDayMemory(data.memory_data);
+          else loadLocal();
+        });
+    } else {
+      loadLocal();
+    }
+  }, [currentDay, dayData, navigate, user]);
+
+  const saveMemory = async (newMemory) => {
     setDayMemory(newMemory);
     try {
       const globalMemory = JSON.parse(localStorage.getItem('workout_memory') || '{}');
       globalMemory[currentDay] = newMemory;
       localStorage.setItem('workout_memory', JSON.stringify(globalMemory));
+      
+      // Sync back to cloud if pro
+      if (user && isPro) {
+        await supabase.from('workout_sync').upsert(
+          { user_id: user.id, day_id: currentDay, memory_data: newMemory },
+          { onConflict: 'user_id,day_id' }
+        );
+      }
     } catch (e) {
       console.error("Storage full or blocked", e);
     }
@@ -60,7 +88,7 @@ export default function Tracker({ unit }) {
   const isRestDay = dayData.focus.includes('Rest') || dayData.exercises.length === 0;
 
   return (
-    <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto', paddingBottom: '100px' }}>
+    <div className="mobile-padding" style={{ padding: '20px', maxWidth: '800px', margin: '0 auto', paddingBottom: '100px' }}>
       
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '40px' }}>
         <Link to="/" style={{ color: 'var(--text-secondary)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -80,7 +108,30 @@ export default function Tracker({ unit }) {
         </p>
       </motion.div>
 
-      <WorkoutTimer />
+      {isPro ? (
+        <WorkoutTimer />
+      ) : (
+        <a href="#pro-upgrade" style={{ textDecoration: 'none' }} onClick={() => navigate('/#pro')}>
+          <motion.div 
+            whileHover={{ scale: 1.02 }}
+            style={{ 
+              background: 'rgba(255, 51, 102, 0.05)', 
+              border: '1px dashed var(--accent-alert)',
+              padding: '16px',
+              borderRadius: 'var(--radius-lg)',
+              marginBottom: '24px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '12px',
+              color: 'var(--text-secondary)'
+            }}
+          >
+            <Lock size={18} className="text-neon" style={{ color: 'var(--accent-alert)' }}/>
+            <span>Pro / Founder Feature: Active Rest Timer (Tap to Upgrade)</span>
+          </motion.div>
+        </a>
+      )}
 
       {isRestDay ? (
         <motion.div 

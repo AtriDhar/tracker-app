@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Play, ArrowRight, CalendarDays } from 'lucide-react';
+import { Play, ArrowRight, CalendarDays, Lock, CheckCircle2, UserCircle } from 'lucide-react';
 import DashboardStats from '../components/DashboardStats';
 import { workoutData } from '../data/workoutData';
+import { useAuth } from '../components/AuthContainer';
 
 export default function Home({ unit, onUnitChange }) {
+  const { user, isPro, signOut } = useAuth();
   const [stats, setStats] = useState({
     totalDone: 0,
     completionRate: 0,
@@ -139,6 +141,65 @@ export default function Home({ unit, onUnitChange }) {
             </Link>
           ))}
         </div>
+      </section>
+
+      <section id="pro" style={{ marginTop: '60px', borderTop: '1px solid var(--border-subtle)', paddingTop: '40px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+          <h2>Account & Billing</h2>
+          {!user ? (
+            <Link to="/auth" style={{ textDecoration: 'none' }}>
+              <button className="btn-primary" style={{ padding: '8px 16px', fontSize: '0.9rem' }}><UserCircle size={18}/> Login / Sign Up</button>
+            </Link>
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <span style={{ color: 'var(--text-secondary)' }}>LoggedIn: {user.email}</span>
+              <button onClick={signOut} className="btn-primary" style={{ padding: '8px 16px', background: 'var(--bg-tertiary)', fontSize: '0.9rem' }}>Sign Out</button>
+            </div>
+          )}
+        </div>
+
+        {isPro ? (
+          <div className="glass-card" style={{ borderLeft: '4px solid var(--accent-neon)' }}>
+            <h3><CheckCircle2 className="text-neon" style={{ display: 'inline', marginRight: '8px', verticalAlign: 'text-bottom' }}/> You are a Pro Member!</h3>
+            <p style={{ color: 'var(--text-secondary)', marginTop: '8px' }}>
+              You have full, lifetime access to cloud-syncing and the active rest timer. Go crush your workout.
+            </p>
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(300px, 1fr) minmax(300px, 1fr)', gap: '20px' }}>
+            <motion.div className="glass-card" whileHover={{ scale: 1.01 }}>
+              <h3 style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>Free Tier</h3>
+              <div style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '24px' }}>$0 <span style={{ fontSize: '1rem', color: 'var(--text-tertiary)' }}>/ forever</span></div>
+              <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px 0', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <li style={{ display: 'flex', gap: '8px', color: 'var(--text-secondary)' }}><CheckCircle2 size={18} className="text-neon" /> Local Storage Tracking</li>
+                <li style={{ display: 'flex', gap: '8px', color: 'var(--text-secondary)' }}><CheckCircle2 size={18} className="text-neon" /> Basic Analytics</li>
+                <li style={{ display: 'flex', gap: '8px', color: 'var(--text-tertiary)' }}><Lock size={18} /> No Cloud Syncing</li>
+                <li style={{ display: 'flex', gap: '8px', color: 'var(--text-tertiary)' }}><Lock size={18} /> No Active Rest Timer</li>
+              </ul>
+              {!user && <Link to="/auth" style={{ textDecoration: 'none' }}><button className="btn-primary" style={{ width: '100%', justifyContent: 'center' }}>Create Account To Upgrade</button></Link>}
+            </motion.div>
+
+            <motion.div className="glass-card" whileHover={{ scale: 1.01 }} style={{ borderColor: 'var(--accent-primary)', position: 'relative' }}>
+              <div style={{ position: 'absolute', top: '-12px', right: '20px', background: 'var(--accent-primary)', color: 'white', padding: '4px 12px', borderRadius: '16px', fontSize: '0.8rem', fontWeight: 'bold' }}>Most Popular</div>
+              <h3 style={{ color: 'var(--text-primary)', marginBottom: '16px' }}>Tracker Pro</h3>
+              <div style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '24px' }}>$3 <span style={{ fontSize: '1rem', color: 'var(--text-tertiary)' }}>/ month</span> <span style={{ fontSize: '1rem', fontWeight: 400 }}>or $15 Lifetime</span></div>
+              <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px 0', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <li style={{ display: 'flex', gap: '8px', color: 'var(--text-primary)' }}><CheckCircle2 size={18} className="text-neon" /> Secure Cloud Database Sync</li>
+                <li style={{ display: 'flex', gap: '8px', color: 'var(--text-primary)' }}><CheckCircle2 size={18} className="text-neon" /> Access from Any Device</li>
+                <li style={{ display: 'flex', gap: '8px', color: 'var(--text-primary)' }}><CheckCircle2 size={18} className="text-neon" /> Elite Active Rest Timers</li>
+                <li style={{ display: 'flex', gap: '8px', color: 'var(--text-primary)' }}><CheckCircle2 size={18} className="text-neon" /> Unlimited Tracker History</li>
+              </ul>
+              {user ? (
+                <div style={{ display: 'flex', gap: '12px' }}>
+                  <a href="#" className="btn-primary" style={{ flex: 1, justifyContent: 'center', background: 'var(--bg-tertiary)', textDecoration: 'none' }}>$3 / Mo</a>
+                  <a href="#" className="btn-primary" style={{ flex: 1, justifyContent: 'center', background: 'var(--accent-primary)', textDecoration: 'none' }}>$15 Lifetime</a>
+                </div>
+              ) : (
+                <Link to="/auth" style={{ textDecoration: 'none' }}><button className="btn-primary" style={{ width: '100%', justifyContent: 'center' }}>Sign Up to Upgrade</button></Link>
+              )}
+            </motion.div>
+          </div>
+        )}
       </section>
     </div>
   );

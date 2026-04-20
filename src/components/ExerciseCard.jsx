@@ -75,7 +75,7 @@ export default function ExerciseCard({ exercise, data, onUpdate, onOpenVideo, un
         )}
       </AnimatePresence>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '12px', alignItems: 'center' }}>
+      <div className="mobile-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '12px', alignItems: 'center' }}>
         <div>
           <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-tertiary)', marginBottom: '4px' }}>Load Used</label>
           <input 

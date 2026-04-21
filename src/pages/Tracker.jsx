@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { ArrowLeft, ChevronLeft, ChevronRight, Lock } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowLeft, ChevronLeft, ChevronRight, Lock, Trophy, Sparkles } from 'lucide-react';
 import ExerciseCard from '../components/ExerciseCard';
 import VideoModal from '../components/VideoModal';
 import WorkoutTimer from '../components/WorkoutTimer';
+import MotivationalQuote from '../components/MotivationalQuote';
 import { workoutData } from '../data/workoutData';
 import { useAuth } from '../components/AuthContainer';
 import { supabase } from '../lib/supabase';
@@ -17,9 +18,11 @@ export default function Tracker({ unit }) {
   
   const dayData = workoutData.find(d => d.day === currentDay);
   
-  // State for tracked data per exercise: { [exerciseId]: { done: bool, load: string, achieved: string } }
+  // State for tracked data per exercise: { [exerciseId]: { done: bool, load: string, achieved: string, time_spent: number } }
   const [dayMemory, setDayMemory] = useState({});
+  const [workoutHistory, setWorkoutHistory] = useState([]);
   const [activeVideoEx, setActiveVideoEx] = useState(null);
+  const [showCelebration, setShowCelebration] = useState(false);
 
   useEffect(() => {
     if (!dayData) {
@@ -32,6 +35,8 @@ export default function Tracker({ unit }) {
       try {
         const memory = JSON.parse(localStorage.getItem('workout_memory') || '{}');
         setDayMemory(memory[currentDay] || {});
+        const history = JSON.parse(localStorage.getItem('workout_history') || '[]');
+        setWorkoutHistory(history);
       } catch (e) {
         console.error(e);
       }
@@ -46,8 +51,10 @@ export default function Tracker({ unit }) {
         .single()
         .then(({ data, error }) => {
           if (!error && data) setDayMemory(data.memory_data);
-          else loadLocal();
         });
+
+      // We can also load history from local for now, and optionally sync to cloud if table exists
+      loadLocal();
     } else {
       loadLocal();
     }
@@ -73,23 +80,92 @@ export default function Tracker({ unit }) {
   };
 
   const handleUpdate = (exerciseId, updateData) => {
-    const updated = {
-      ...dayMemory,
-      [exerciseId]: {
-        ...(dayMemory[exerciseId] || {}),
-        ...updateData
-      }
-    };
+    const updated = { ...dayMemory, [exerciseId]: { ...(dayMemory[exerciseId] || {}), ...updateData } };
     saveMemory(updated);
+  };
+
+  // Extract a custom target based on history
+  const getCustomTarget = (exId) => {
+    for (let i = workoutHistory.length - 1; i >= 0; i--) {
+      const session = workoutHistory[i];
+      if (session.memory_data && session.memory_data[exId]) {
+        const lastExData = session.memory_data[exId];
+        if (lastExData.load && lastExData.achieved && lastExData.done) {
+           return `${lastExData.load} (did ${lastExData.achieved})`;
+        }
+      }
+    }
+    return null;
+  };
+
+  const finishSession = async () => {
+    const sessionRecord = {
+      date: new Date().toISOString(),
+      day_id: currentDay,
+      memory_data: dayMemory
+    };
+    const newHistory = [...workoutHistory, sessionRecord];
+    setWorkoutHistory(newHistory);
+    localStorage.setItem('workout_history', JSON.stringify(newHistory));
+
+    if (user && isPro) {
+       // Optional: try to save to a history table if it exists
+       try {
+         await supabase.from('workout_history_log').insert({
+            user_id: user.id,
+            day_id: currentDay,
+            memory_data: dayMemory,
+            completed_at: new Date().toISOString()
+         });
+       } catch (e) { console.error(e); }
+    }
+
+    // Reset current day tracking for next time, except keep the target records implicitly via history
+    const resetMemory = {};
+    Object.keys(dayMemory).forEach(key => {
+      // Keep load as default input but clear achieved and done
+      resetMemory[key] = { load: dayMemory[key].load, achieved: '', done: false, time_spent: 0 };
+    });
+    await saveMemory(resetMemory);
+    
+    setShowCelebration(true);
+    setTimeout(() => {
+       setShowCelebration(false);
+       navigate('/');
+    }, 4000);
   };
 
   if (!dayData) return <div style={{ color: 'white', padding: '40px' }}>Loading or Invalid Day...</div>;
 
   const isRestDay = dayData.focus.includes('Rest') || dayData.exercises.length === 0;
+  
+  // Calculate completion
+  const totalExercises = dayData.exercises.length;
+  const doneExercises = Object.values(dayMemory).filter(v => v.done).length;
+  const completionPercent = totalExercises > 0 ? Math.round((doneExercises / totalExercises) * 100) : 0;
 
   return (
-    <div className="mobile-padding" style={{ padding: '20px', maxWidth: '800px', margin: '0 auto', paddingBottom: '100px' }}>
+    <div className="mobile-padding" style={{ padding: '20px', maxWidth: '800px', margin: '0 auto', paddingBottom: '120px', position: 'relative' }}>
       
+      <AnimatePresence>
+        {showCelebration && (
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 1.1 }}
+            style={{
+              position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+              background: 'rgba(0,0,0,0.8)', zIndex: 999,
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'white'
+             }}
+          >
+            <Trophy size={80} color="var(--accent-neon)" style={{ marginBottom: '20px' }} />
+            <h1 style={{ color: 'white' }}>Workout Completed!</h1>
+            <p style={{ color: 'var(--text-secondary)' }}>Session added to history. Great job.</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '40px' }}>
         <Link to="/" style={{ color: 'var(--text-secondary)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
           <ArrowLeft size={20} /> Dashboard
@@ -158,6 +234,7 @@ export default function Tracker({ unit }) {
               <ExerciseCard 
                 exercise={ex} 
                 data={dayMemory[ex.id] || {}}
+                customTarget={getCustomTarget(ex.id)}
                 onUpdate={(data) => handleUpdate(ex.id, data)}
                 onOpenVideo={(exData) => setActiveVideoEx(exData)}
                 unit={unit}
@@ -165,6 +242,23 @@ export default function Tracker({ unit }) {
             </motion.div>
           ))}
         </div>
+      )}
+
+      {completionPercent === 100 && !showCelebration && (
+         <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            style={{ marginTop: '20px' }}
+         >
+            <MotivationalQuote />
+            <button 
+              onClick={finishSession}
+              className="btn-primary" 
+              style={{ width: '100%', justifyContent: 'center', padding: '16px', fontSize: '1.2rem', gap: '8px' }}
+            >
+              <Sparkles size={20} /> Finish & Log Session
+            </button>
+         </motion.div>
       )}
 
       {/* Floating progress bar at bottom */}
@@ -179,25 +273,24 @@ export default function Tracker({ unit }) {
         backdropFilter: 'blur(12px)',
         padding: '16px 20px',
         borderRadius: 'var(--radius-lg)',
-        border: '1px solid var(--border-subtle)',
+        border: completionPercent === 100 ? "1px solid var(--accent-neon)" : "1px solid var(--border-subtle)",
         display: 'flex',
         alignItems: 'center',
         gap: '20px',
         zIndex: 50,
-        boxShadow: '0 4px 30px rgba(0,0,0,0.5)'
+        boxShadow: completionPercent === 100 ? '0 0 20px rgba(69, 97, 255, 0.4)' : '0 4px 30px rgba(0,0,0,0.5)',
+        transition: 'all 0.3s'
       }}>
         <div style={{ flex: 1 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '0.9rem' }}>
             <span style={{ color: 'var(--text-secondary)' }}>Daily Session Completion</span>
-            <span style={{ fontWeight: 600, color: 'var(--accent-neon)' }}>
-              {Math.round((Object.values(dayMemory).filter(v => v.done).length / Math.max(1, dayData.exercises.length)) * 100)}%
-            </span>
+            <span style={{ fontWeight: 600, color: 'var(--accent-neon)' }}>{completionPercent}%</span>
           </div>
           <div style={{ height: '6px', background: 'var(--bg-tertiary)', borderRadius: '3px', overflow: 'hidden' }}>
             <motion.div 
               style={{ height: '100%', background: 'var(--accent-neon)' }}
               initial={{ width: 0 }}
-              animate={{ width: `${(Object.values(dayMemory).filter(v => v.done).length / Math.max(1, dayData.exercises.length)) * 100}%` }}
+              animate={{ width: `${completionPercent}%` }}
               transition={{ type: 'spring', damping: 20 }}
             />
           </div>

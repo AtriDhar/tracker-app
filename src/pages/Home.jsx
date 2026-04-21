@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Play, ArrowRight, CalendarDays, Lock, CheckCircle2, UserCircle } from 'lucide-react';
+import Hero3DBox from '../components/Hero3DBox';
+import MotivationalQuote from '../components/MotivationalQuote';
 import DashboardStats from '../components/DashboardStats';
 import { workoutData } from '../data/workoutData';
 import { useAuth } from '../components/AuthContainer';
@@ -55,62 +57,77 @@ export default function Home({ unit, onUnitChange }) {
 
   return (
     <div style={{ padding: '40px 20px', maxWidth: '1200px', margin: '0 auto' }}>
-      <header style={{ marginBottom: '60px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        <motion.div 
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div style={{ background: 'var(--accent-neon)', width: '40px', height: '4px', borderRadius: '2px' }}></div>
-              <span style={{ color: 'var(--accent-neon)', fontWeight: 600, letterSpacing: '2px', textTransform: 'uppercase' }}>Cbum 8-Day Split</span>
+      <header style={{ marginBottom: '60px' }}>
+        <div className="mobile-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px', alignItems: 'center' }}>
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ background: 'var(--accent-neon)', width: '40px', height: '4px', borderRadius: '2px' }}></div>
+                <span style={{ color: 'var(--accent-neon)', fontWeight: 600, letterSpacing: '2px', textTransform: 'uppercase' }}>Cbum 8-Day Split</span>
+              </div>
+              
+              <div style={{ display: 'flex', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-sm)', padding: '4px', border: '1px solid var(--border-subtle)', marginLeft: '16px' }}>
+                <button 
+                  onClick={() => onUnitChange('kg')}
+                  style={{ 
+                    padding: '4px 12px', 
+                    borderRadius: '4px',
+                    background: unit === 'kg' ? 'var(--accent-primary)' : 'transparent',
+                    color: unit === 'kg' ? '#fff' : 'var(--text-secondary)'
+                  }}
+                >Kg</button>
+                <button 
+                  onClick={() => onUnitChange('lbs')}
+                  style={{ 
+                    padding: '4px 12px', 
+                    borderRadius: '4px',
+                    background: unit === 'lbs' ? 'var(--accent-primary)' : 'transparent',
+                    color: unit === 'lbs' ? '#fff' : 'var(--text-secondary)'
+                  }}
+                >Lbs</button>
+              </div>
             </div>
+            <h1 style={{ fontSize: '3rem', lineHeight: '1.2' }}>Ultimate Daily <br/><span className="text-gradient">Workout Tracker</span></h1>
+            <p style={{ color: 'var(--text-secondary)', maxWidth: '600px', fontSize: '1.2rem', lineHeight: 1.6, marginTop: '16px' }}>
+              Elevate your training with this state-of-the-art interactive tracker. Maintain your progress, track your loads, master the movements.
+            </p>
             
-            <div style={{ display: 'flex', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-sm)', padding: '4px', border: '1px solid var(--border-subtle)' }}>
-              <button 
-                onClick={() => onUnitChange('kg')}
-                style={{ 
-                  padding: '4px 12px', 
-                  borderRadius: '4px',
-                  background: unit === 'kg' ? 'var(--accent-primary)' : 'transparent',
-                  color: unit === 'kg' ? '#fff' : 'var(--text-secondary)'
-                }}
-              >Kg</button>
-              <button 
-                onClick={() => onUnitChange('lbs')}
-                style={{ 
-                  padding: '4px 12px', 
-                  borderRadius: '4px',
-                  background: unit === 'lbs' ? 'var(--accent-primary)' : 'transparent',
-                  color: unit === 'lbs' ? '#fff' : 'var(--text-secondary)'
-                }}
-              >Lbs</button>
-            </div>
-          </div>
-          <h1>Ultimate Daily <br/><span className="text-gradient">Workout Tracker</span></h1>
-          <p style={{ color: 'var(--text-secondary)', maxWidth: '600px', fontSize: '1.2rem', lineHeight: 1.6, marginTop: '16px' }}>
-            Elevate your training with this state-of-the-art interactive tracker. Maintain your progress, track your loads, and master the movements.
-          </p>
-        </motion.div>
-        
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          style={{ display: 'flex', gap: '16px', marginTop: '20px' }}
-        >
-          <Link to="/tracker/1" style={{ textDecoration: 'none' }}>
-            <button className="btn-primary" style={{ padding: '16px 32px', fontSize: '1.1rem' }}>
-              <Play fill="var(--bg-primary)" size={20}/> Start Workout
-            </button>
-          </Link>
-          <Link to="/tracker/1" style={{ textDecoration: 'none' }}>
-            <button className="btn-primary" style={{ background: 'var(--bg-tertiary)', color: 'var(--text-primary)', padding: '16px 32px' }}>
-              <CalendarDays size={20}/> View Schedule
-            </button>
-          </Link>
-        </motion.div>
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              style={{ display: 'flex', gap: '16px', marginTop: '32px' }}
+            >
+              <Link to="/tracker/1" style={{ textDecoration: 'none' }}>
+                <button className="btn-primary" style={{ padding: '16px 32px', fontSize: '1.1rem' }}>
+                  <Play fill="var(--bg-primary)" size={20}/> Start Workout
+                </button>
+              </Link>
+              <Link to="/tracker/1" style={{ textDecoration: 'none' }}>
+                <button className="btn-primary" style={{ background: 'var(--bg-tertiary)', color: 'var(--text-primary)', padding: '16px 32px' }}>
+                  <CalendarDays size={20}/> View Schedule
+                </button>
+              </Link>
+            </motion.div>
+          </motion.div>
+          
+          <motion.div
+             initial={{ opacity: 0, scale: 0.9 }}
+             animate={{ opacity: 1, scale: 1 }}
+             transition={{ delay: 0.3 }}
+             className="hero-3d-container"
+          >
+            <Hero3DBox />
+          </motion.div>
+        </div>
       </header>
+
+      <section>
+        <MotivationalQuote />
+      </section>
 
       <section>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '24px' }}>

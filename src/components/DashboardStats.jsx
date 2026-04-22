@@ -47,9 +47,10 @@ export default function DashboardStats({ stats }) {
           style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '20px' }}
         >
           <div style={{ 
-            background: 'rgba(0, 255, 136, 0.1)', 
+            background: 'var(--accent-neon-glow)', 
             padding: '12px', 
-            borderRadius: 'var(--radius-md)' 
+            borderRadius: 'var(--radius-md)',
+            boxShadow: '0 4px 10px rgba(0,0,0,0.2)'
           }}>
             {stat.icon}
           </div>

@@ -1,43 +1,43 @@
 import React, { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Float, Environment } from '@react-three/drei';
+import { Float, Environment, ContactShadows } from '@react-three/drei';
 
-function Dumbbell() {
-  const meshRef = useRef();
+function AbstractInfinityCore() {
+  const coreRef = useRef();
+  const ringRef = useRef();
   
   useFrame((state, delta) => {
-    if (meshRef.current) {
-        meshRef.current.rotation.x += delta * 0.15;
-        meshRef.current.rotation.y += delta * 0.4;
+    if (coreRef.current && ringRef.current) {
+        coreRef.current.rotation.x += delta * 0.2;
+        coreRef.current.rotation.y += delta * 0.3;
+        
+        ringRef.current.rotation.x -= delta * 0.1;
+        ringRef.current.rotation.z += delta * 0.2;
     }
   });
 
   return (
-    <group ref={meshRef}>
-      {/* Handle - Now Luxury Gold */}
-      <mesh rotation={[0, 0, Math.PI / 2]}>
-        <cylinderGeometry args={[0.15, 0.15, 2.5, 32]} />
-        <meshStandardMaterial color="#d9b360" metalness={0.9} roughness={0.2} />
+    <group>
+      {/* Outer abstract ring */}
+      <mesh ref={ringRef} scale={1.2}>
+        <torusGeometry args={[1.5, 0.05, 16, 100]} />
+        <meshStandardMaterial color="#d9b360" metalness={1} roughness={0.15} />
       </mesh>
       
-      {/* Left Weights - Deep Charcoal */}
-      <mesh position={[-0.9, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
-        <cylinderGeometry args={[0.9, 0.9, 0.3, 32]} />
-        <meshStandardMaterial color="#2d2d38" metalness={0.6} roughness={0.4} />
-      </mesh>
-      <mesh position={[-1.3, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
-        <cylinderGeometry args={[0.7, 0.7, 0.3, 32]} />
-        <meshStandardMaterial color="#2d2d38" metalness={0.6} roughness={0.4} />
-      </mesh>
-      
-      {/* Right Weights - Deep Charcoal */}
-      <mesh position={[0.9, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
-        <cylinderGeometry args={[0.9, 0.9, 0.3, 32]} />
-        <meshStandardMaterial color="#2d2d38" metalness={0.6} roughness={0.4} />
-      </mesh>
-      <mesh position={[1.3, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
-        <cylinderGeometry args={[0.7, 0.7, 0.3, 32]} />
-        <meshStandardMaterial color="#2d2d38" metalness={0.6} roughness={0.4} />
+      {/* Inner premium poly core */}
+      <mesh ref={coreRef}>
+        <icosahedronGeometry args={[1, 1]} />
+        <meshStandardMaterial 
+          color="#2d2d38" 
+          metalness={0.8} 
+          roughness={0.2} 
+          wireframe={false}
+        />
+        {/* Subtle wireframe overlay for tech feel */}
+        <mesh>
+           <icosahedronGeometry args={[1.01, 1]} />
+           <meshBasicMaterial color="#d9b360" wireframe={true} opacity={0.2} transparent={true} />
+        </mesh>
       </mesh>
     </group>
   );
@@ -45,13 +45,15 @@ function Dumbbell() {
 
 export default function Hero3DBox() {
   return (
-    <div style={{ height: '350px', width: '100%', position: 'relative', marginTop: '-40px', marginBottom: '-20px' }}>
-      <Canvas camera={{ position: [0, 0, 5], fov: 45 }} style={{ pointerEvents: 'none' }}>
-        <ambientLight intensity={0.5} />
-        <pointLight position={[10, 10, 10]} intensity={1} />
-        <Float speed={2} rotationIntensity={1} floatIntensity={2}>
-          <Dumbbell />
+    <div style={{ height: '380px', width: '100%', position: 'relative', marginTop: '-40px', marginBottom: '-20px' }}>
+      <Canvas camera={{ position: [0, 0, 6], fov: 45 }} style={{ pointerEvents: 'none' }}>
+        <ambientLight intensity={0.4} />
+        <pointLight position={[10, 10, 10]} intensity={1.5} color="#ffffff" />
+        <pointLight position={[-10, -10, -10]} intensity={1} color="#46345d" />
+        <Float speed={2} rotationIntensity={0.5} floatIntensity={1.5}>
+          <AbstractInfinityCore />
         </Float>
+        <ContactShadows position={[0, -2, 0]} opacity={0.4} scale={10} blur={2} far={4} color="#000000" />
         <Environment preset="city" />
       </Canvas>
     </div>

@@ -69,7 +69,7 @@ export default function ExerciseCard({ exercise, data, customTarget, onUpdate, o
               </span>
             )}
             {customTarget && !isDone && (
-              <span style={{ background: 'rgba(255, 51, 102, 0.1)', color: 'var(--accent-alert)', border: '1px solid var(--accent-alert)', padding: '2px 8px', borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <span style={{ background: 'rgba(217, 179, 96, 0.1)', color: 'var(--accent-neon)', border: '1px solid var(--accent-neon)', padding: '2px 8px', borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
                 Target: {customTarget}
               </span>
             )}
@@ -96,7 +96,7 @@ export default function ExerciseCard({ exercise, data, customTarget, onUpdate, o
             style={{ overflow: 'hidden' }}
           >
             <div style={{ 
-              background: 'rgba(69, 97, 255, 0.1)', 
+              background: 'rgba(70, 52, 93, 0.2)', 
               borderLeft: '3px solid var(--accent-primary)',
               padding: '12px',
               borderRadius: '0 var(--radius-sm) var(--radius-sm) 0',

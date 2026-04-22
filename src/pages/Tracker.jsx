@@ -211,10 +211,11 @@ export default function Tracker({ unit }) {
 
       {isRestDay ? (
         <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }} 
-          animate={{ opacity: 1, scale: 1 }}
+          initial={{ opacity: 0, scale: 0.95, filter: 'blur(10px)' }} 
+          animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+          transition={{ duration: 0.6 }}
           className="glass-card" 
-          style={{ textAlign: 'center', padding: '60px 20px', borderTop: '4px solid var(--accent-primary)' }}
+          style={{ textAlign: 'center', padding: '60px 20px', borderTop: '4px solid var(--accent-neon)' }}
         >
           <div style={{ fontSize: '4rem', marginBottom: '20px' }}>🧘</div>
           <h2>Rest & Recovery</h2>
@@ -223,13 +224,14 @@ export default function Tracker({ unit }) {
           </p>
         </motion.div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {dayData.exercises.map((ex, index) => (
             <motion.div 
               key={ex.id}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.05 }}
+              initial={{ opacity: 0, y: 30, scale: 0.98 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.5, delay: index * 0.05 }}
             >
               <ExerciseCard 
                 exercise={ex} 
@@ -246,47 +248,56 @@ export default function Tracker({ unit }) {
 
       {completionPercent === 100 && !showCelebration && (
          <motion.div 
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            style={{ marginTop: '20px' }}
+            initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }}
+            whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            style={{ marginTop: '30px' }}
          >
             <MotivationalQuote />
             <button 
               onClick={finishSession}
               className="btn-primary" 
-              style={{ width: '100%', justifyContent: 'center', padding: '16px', fontSize: '1.2rem', gap: '8px' }}
+              style={{ width: '100%', justifyContent: 'center', padding: '18px', fontSize: '1.25rem', gap: '12px', background: 'var(--accent-neon)', color: 'var(--bg-primary)' }}
             >
-              <Sparkles size={20} /> Finish & Log Session
+              <Sparkles size={24} /> Finish & Log Session
             </button>
          </motion.div>
       )}
 
       {/* Floating progress bar at bottom */}
-      <div style={{
-        position: 'fixed',
-        bottom: '20px',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        width: 'calc(100% - 40px)',
-        maxWidth: '800px',
-        background: 'var(--bg-card)',
-        backdropFilter: 'blur(12px)',
-        padding: '16px 20px',
-        borderRadius: 'var(--radius-lg)',
-        border: completionPercent === 100 ? "1px solid var(--accent-neon)" : "1px solid var(--border-subtle)",
-        display: 'flex',
-        alignItems: 'center',
-        gap: '20px',
-        zIndex: 50,
-        boxShadow: completionPercent === 100 ? '0 0 20px rgba(69, 97, 255, 0.4)' : '0 4px 30px rgba(0,0,0,0.5)',
-        transition: 'all 0.3s'
-      }}>
+      <motion.div 
+        initial={{ y: 100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.5, duration: 0.6, type: 'spring' }}
+        style={{
+          position: 'fixed',
+          bottom: '24px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: 'calc(100% - 40px)',
+          maxWidth: '800px',
+          background: completionPercent === 100 ? 'rgba(217, 179, 96, 0.1)' : 'var(--bg-card)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          padding: '16px 24px',
+          borderRadius: 'var(--radius-lg)',
+          border: completionPercent === 100 ? "1px solid var(--accent-neon)" : "1px solid var(--border-subtle)",
+          borderTop: '1px solid rgba(255,255,255,0.1)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '20px',
+          zIndex: 50,
+          boxShadow: completionPercent === 100 ? '0 0 30px rgba(217, 179, 96, 0.2)' : '0 10px 40px rgba(0,0,0,0.6)',
+          transition: 'all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1)'
+        }}
+      >
         <div style={{ flex: 1 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '0.9rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', fontSize: '0.95rem' }}>
             <span style={{ color: 'var(--text-secondary)' }}>Daily Session Completion</span>
-            <span style={{ fontWeight: 600, color: 'var(--accent-neon)' }}>{completionPercent}%</span>
+            <span style={{ fontWeight: 800, color: 'var(--accent-neon)' }}>{completionPercent}%</span>
           </div>
-          <div style={{ height: '6px', background: 'var(--bg-tertiary)', borderRadius: '3px', overflow: 'hidden' }}>
+          <div style={{ height: '8px', background: 'var(--bg-tertiary)', borderRadius: '4px', overflow: 'hidden' }}>
             <motion.div 
               style={{ height: '100%', background: 'var(--accent-neon)' }}
               initial={{ width: 0 }}
@@ -295,7 +306,7 @@ export default function Tracker({ unit }) {
             />
           </div>
         </div>
-      </div>
+      </motion.div>
 
       <VideoModal 
         isOpen={!!activeVideoEx} 

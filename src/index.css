@@ -1,33 +1,34 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-  /* Color Palette - Premium Dark Gym aesthetic */
-  --bg-primary: #0a0a0c;
-  --bg-secondary: #141418;
-  --bg-tertiary: #1f1f25;
-  --bg-card: rgba(30, 30, 36, 0.7);
+  /* Elevated Neutrals & High-End Dark Mode (60-30-10 Rule) */
+  --bg-primary: #121216; /* 60%: Very deep charcoal, avoids #000 */
+  --bg-secondary: #1a1a20; 
+  --bg-tertiary: #22222a;
+  --bg-card: rgba(26, 26, 32, 0.55); /* Deep translucent glass */
   
   /* Text */
-  --text-primary: #ffffff;
-  --text-secondary: #9494a0;
-  --text-tertiary: #5e5e6a;
+  --text-primary: #f0f0ea; /* Oatmeal/off-white */
+  --text-secondary: #a3a3ad;
+  --text-tertiary: #6b6b75;
   
-  /* Accents */
-  --accent-neon: #00ff88;
-  --accent-neon-glow: rgba(0, 255, 136, 0.4);
-  --accent-primary: #4561ff;
-  --accent-alert: #ff3366;
+  /* Accents - 30% Structural / 10% CTA */
+  --accent-primary: #46345d; /* 30%: Deep plum structural accent */
+  --accent-neon: #d9b360; /* 10%: Luxury gold/tan CTA color */
+  --accent-neon-glow: rgba(217, 179, 96, 0.4);
+  --accent-alert: #d96070; /* Softened alert red */
   
   /* Borders and UI */
   --border-subtle: rgba(255, 255, 255, 0.05);
-  --border-hover: rgba(255, 255, 255, 0.1);
-  --radius-lg: 16px;
-  --radius-md: 12px;
+  --border-hover: rgba(255, 255, 255, 0.12);
+  --radius-lg: 20px;
+  --radius-md: 14px;
   --radius-sm: 8px;
   
   /* Transitions */
-  --transition-fast: 0.15s ease-out;
-  --transition-normal: 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  --transition-fast: 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  --transition-normal: 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  --transition-slow: 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 * {
@@ -41,28 +42,65 @@
 
 body {
   background-color: var(--bg-primary);
-  background-image: 
-    radial-gradient(circle at 15% 50%, rgba(69, 97, 255, 0.03) 0%, transparent 50%),
-    radial-gradient(circle at 85% 30%, rgba(0, 255, 136, 0.03) 0%, transparent 50%);
   min-height: 100vh;
   overflow-x: hidden;
+  position: relative;
 }
 
-/* Glassmorphism Cards */
+/* Ambient Background Blobs for Glassmorphism Context */
+.ambient-background {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: -1;
+  overflow: hidden;
+  background: var(--bg-primary);
+}
+
+.ambient-blob {
+  position: absolute;
+  filter: blur(120px);
+  border-radius: 50%;
+  animation: float 25s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0.6;
+}
+
+.ambient-blob-1 {
+  background: rgba(70, 52, 93, 0.45); /* Deep plum glow */
+  width: 60vw; height: 60vw;
+  top: -15%; left: -20%;
+}
+
+.ambient-blob-2 {
+  background: rgba(217, 179, 96, 0.15); /* Gold tan glow */
+  width: 50vw; height: 50vw;
+  bottom: -10%; right: -15%;
+  animation-delay: -12s;
+}
+
+@keyframes float {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(10%, 15%) scale(1.1); }
+  100% { transform: translate(-5%, 5%) scale(0.9); }
+}
+
+/* Deep Glassmorphism Cards */
 .glass-card {
   background: var(--bg-card);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--border-subtle);
+  border-top: 1px solid rgba(255, 255, 255, 0.1); /* light reflection */
+  border-left: 1px solid rgba(255, 255, 255, 0.08); /* light reflection */
   border-radius: var(--radius-lg);
-  padding: 24px;
-  transition: transform var(--transition-normal), border-color var(--transition-normal), box-shadow var(--transition-normal);
+  padding: 32px;
+  box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.4);
+  transition: transform var(--transition-normal), border-color var(--transition-normal), box-shadow var(--transition-normal), background var(--transition-normal);
 }
 
 .glass-card:hover {
   border-color: var(--border-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  background: rgba(30, 30, 38, 0.65);
+  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.6);
 }
 
 /* Base interactive */
@@ -77,45 +115,49 @@ button {
 .btn-primary {
   background: var(--text-primary);
   color: var(--bg-primary);
-  padding: 12px 24px;
+  padding: 14px 28px;
   border-radius: var(--radius-md);
   font-weight: 600;
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 1rem;
+  justify-content: center;
+  gap: 10px;
+  font-size: 1.05rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .btn-primary:hover {
   background: var(--accent-neon);
-  box-shadow: 0 0 15px var(--accent-neon-glow);
-  transform: scale(1.02);
+  box-shadow: 0 8px 25px var(--accent-neon-glow);
+  transform: translateY(-2px);
 }
 
 .btn-icon {
   background: var(--bg-secondary);
   border: 1px solid var(--border-subtle);
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--text-secondary);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
 .btn-icon:hover {
   background: var(--bg-tertiary);
   color: var(--text-primary);
   border-color: var(--border-hover);
+  transform: scale(1.05);
 }
 
 /* Checkbox Base Override */
 .custom-checkbox {
   appearance: none;
-  width: 24px;
-  height: 24px;
-  border: 2px solid var(--border-hover);
+  width: 26px;
+  height: 26px;
+  border: 2px solid var(--border-subtle);
   border-radius: var(--radius-sm);
   background: var(--bg-secondary);
   cursor: pointer;
@@ -129,6 +171,7 @@ button {
 .custom-checkbox:checked {
   background: var(--accent-neon);
   border-color: var(--accent-neon);
+  box-shadow: 0 0 15px var(--accent-neon-glow);
 }
 
 .custom-checkbox:checked::after {
@@ -146,18 +189,18 @@ button {
   background: var(--bg-secondary);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
-  padding: 10px 14px;
+  padding: 12px 16px;
   color: var(--text-primary);
-  font-size: 0.95rem;
+  font-size: 1rem;
   transition: all var(--transition-normal);
   width: 100%;
 }
 
 .custom-input:focus {
   outline: none;
-  border-color: var(--accent-primary);
+  border-color: var(--accent-neon);
   background: var(--bg-tertiary);
-  box-shadow: 0 0 0 3px rgba(69, 97, 255, 0.1);
+  box-shadow: 0 0 0 3px var(--accent-neon-glow);
 }
 
 .custom-input::placeholder {
@@ -171,8 +214,9 @@ button {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(5px);
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   z-index: 100;
   display: flex;
   align-items: center;
@@ -182,34 +226,37 @@ button {
 
 .modal-content {
   background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-hover);
+  border-top: 1px solid rgba(255,255,255,0.15);
   border-radius: var(--radius-lg);
   padding: 30px;
   width: 100%;
   max-width: 600px;
   position: relative;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.8);
 }
 
-h1 { font-size: 2.5rem; font-weight: 800; letter-spacing: -1px; }
-h2 { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.5px; }
-h3 { font-size: 1.25rem; font-weight: 600; }
+h1 { font-size: 3.2rem; font-weight: 800; letter-spacing: -1.5px; }
+h2 { font-size: 2rem; font-weight: 700; letter-spacing: -0.5px; }
+h3 { font-size: 1.35rem; font-weight: 600; }
 .text-gradient {
-  background: linear-gradient(135deg, #ffffff 0%, #a0a0b0 100%);
+  background: linear-gradient(135deg, #ffffff 0%, #b0b0b8 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 .text-neon { color: var(--accent-neon); }
-@media (max-width: 600px) {
+
+@media (max-width: 768px) {
   .mobile-grid {
     grid-template-columns: 1fr !important;
-    gap: 16px !important;
+    gap: 24px !important;
   }
   .mobile-padding {
-    padding: 20px 12px !important;
+    padding: 20px 16px !important;
   }
   .glass-card {
-    padding: 16px;
+    padding: 24px;
   }
-  h1 { font-size: 2rem; }
-  h2 { font-size: 1.5rem; }
+  h1 { font-size: 2.2rem; letter-spacing: -1px; }
+  h2 { font-size: 1.6rem; }
 }

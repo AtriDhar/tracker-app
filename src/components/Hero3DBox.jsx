@@ -14,30 +14,30 @@ function Dumbbell() {
 
   return (
     <group ref={meshRef}>
-      {/* Handle */}
+      {/* Handle - Now Luxury Gold */}
       <mesh rotation={[0, 0, Math.PI / 2]}>
         <cylinderGeometry args={[0.15, 0.15, 2.5, 32]} />
-        <meshStandardMaterial color="#aaaaaa" metalness={0.9} roughness={0.1} />
+        <meshStandardMaterial color="#d9b360" metalness={0.9} roughness={0.2} />
       </mesh>
       
-      {/* Left Weights */}
+      {/* Left Weights - Deep Charcoal */}
       <mesh position={[-0.9, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
         <cylinderGeometry args={[0.9, 0.9, 0.3, 32]} />
-        <meshStandardMaterial color="#1f1f1f" metalness={0.4} roughness={0.6} />
+        <meshStandardMaterial color="#2d2d38" metalness={0.6} roughness={0.4} />
       </mesh>
       <mesh position={[-1.3, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
         <cylinderGeometry args={[0.7, 0.7, 0.3, 32]} />
-        <meshStandardMaterial color="#1f1f1f" metalness={0.4} roughness={0.6} />
+        <meshStandardMaterial color="#2d2d38" metalness={0.6} roughness={0.4} />
       </mesh>
       
-      {/* Right Weights */}
+      {/* Right Weights - Deep Charcoal */}
       <mesh position={[0.9, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
         <cylinderGeometry args={[0.9, 0.9, 0.3, 32]} />
-        <meshStandardMaterial color="#1f1f1f" metalness={0.4} roughness={0.6} />
+        <meshStandardMaterial color="#2d2d38" metalness={0.6} roughness={0.4} />
       </mesh>
       <mesh position={[1.3, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
         <cylinderGeometry args={[0.7, 0.7, 0.3, 32]} />
-        <meshStandardMaterial color="#1f1f1f" metalness={0.4} roughness={0.6} />
+        <meshStandardMaterial color="#2d2d38" metalness={0.6} roughness={0.4} />
       </mesh>
     </group>
   );

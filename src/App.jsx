@@ -22,14 +22,20 @@ function App() {
 
   return (
     <AuthProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={<Home unit={unit} onUnitChange={handleUnitChange} />} />
-          <Route path="/tracker/:dayId" element={<Tracker unit={unit} />} />
-          <Route path="/auth" element={<Auth />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Router>
+      <div className="ambient-background">
+        <div className="ambient-blob ambient-blob-1"></div>
+        <div className="ambient-blob ambient-blob-2"></div>
+      </div>
+      <div style={{ position: 'relative', zIndex: 1 }}>
+        <Router>
+          <Routes>
+            <Route path="/" element={<Home unit={unit} onUnitChange={handleUnitChange} />} />
+            <Route path="/tracker/:dayId" element={<Tracker unit={unit} />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Router>
+      </div>
     </AuthProvider>
   );
 }

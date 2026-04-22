@@ -1,13 +1,13 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Activity, Target, Flame, Dumbbell } from 'lucide-react';
+import { Activity, Target, Flame, Layers } from 'lucide-react';
 
 export default function DashboardStats({ stats }) {
   const statCards = [
     {
       title: "Total Exercises Done",
       value: stats.totalDone || 0,
-      icon: <Dumbbell className="text-neon" size={24} />,
+      icon: <Layers className="text-neon" size={24} />,
       delay: 0.1
     },
     {

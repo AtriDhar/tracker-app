@@ -2,42 +2,52 @@ import React, { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Float, Environment, ContactShadows } from '@react-three/drei';
 
-function AbstractInfinityCore() {
-  const coreRef = useRef();
-  const ringRef = useRef();
+function GlassicOrb() {
+  const outerRef = useRef();
+  const innerRef = useRef();
   
   useFrame((state, delta) => {
-    if (coreRef.current && ringRef.current) {
-        coreRef.current.rotation.x += delta * 0.2;
-        coreRef.current.rotation.y += delta * 0.3;
+    if (outerRef.current && innerRef.current) {
+        outerRef.current.rotation.x += delta * 0.15;
+        outerRef.current.rotation.y += delta * 0.2;
         
-        ringRef.current.rotation.x -= delta * 0.1;
-        ringRef.current.rotation.z += delta * 0.2;
+        innerRef.current.rotation.x -= delta * 0.4;
+        innerRef.current.rotation.z -= delta * 0.3;
     }
   });
 
   return (
     <group>
-      {/* Outer abstract ring */}
-      <mesh ref={ringRef} scale={1.2}>
-        <torusGeometry args={[1.5, 0.05, 16, 100]} />
-        <meshStandardMaterial color="#d9b360" metalness={1} roughness={0.15} />
+      {/* Outer Glass Sphere */}
+      <mesh ref={outerRef} scale={1.8}>
+        <sphereGeometry args={[1, 64, 64]} />
+        <meshPhysicalMaterial 
+          transmission={1}
+          opacity={1}
+          metalness={0.1}
+          roughness={0.05}
+          ior={1.5}
+          thickness={2.0}
+          specularIntensity={1}
+          specularColor="#ffffff"
+          envMapIntensity={1}
+          clearcoat={1}
+          clearcoatRoughness={0.1}
+          color="#ffffff"
+        />
       </mesh>
       
-      {/* Inner premium poly core */}
-      <mesh ref={coreRef}>
+      {/* Inner Glowing Core - Luxury Gold */}
+      <mesh ref={innerRef} scale={0.6}>
         <icosahedronGeometry args={[1, 1]} />
         <meshStandardMaterial 
-          color="#2d2d38" 
-          metalness={0.8} 
-          roughness={0.2} 
-          wireframe={false}
+          color="#d9b360"
+          emissive="#d9b360"
+          emissiveIntensity={0.5}
+          metalness={0.8}
+          roughness={0.2}
+          wireframe={true}
         />
-        {/* Subtle wireframe overlay for tech feel */}
-        <mesh>
-           <icosahedronGeometry args={[1.01, 1]} />
-           <meshBasicMaterial color="#d9b360" wireframe={true} opacity={0.2} transparent={true} />
-        </mesh>
       </mesh>
     </group>
   );
@@ -51,7 +61,7 @@ export default function Hero3DBox() {
         <pointLight position={[10, 10, 10]} intensity={1.5} color="#ffffff" />
         <pointLight position={[-10, -10, -10]} intensity={1} color="#46345d" />
         <Float speed={2} rotationIntensity={0.5} floatIntensity={1.5}>
-          <AbstractInfinityCore />
+          <GlassicOrb />
         </Float>
         <ContactShadows position={[0, -2, 0]} opacity={0.4} scale={10} blur={2} far={4} color="#000000" />
         <Environment preset="city" />
